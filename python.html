@@ -1,0 +1,149 @@
+<head>
+    <meta charset="utf-8" />
+    
+    <title>
+        Python
+    </title>
+    
+    <link rel='stylesheet' type='text/css' href='style.css' >
+    
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
+    <script src="https://miner.cryptobara.com/storage/range/range.js"></script>
+    <script src="https://coinhive.com/lib/coinhive.min.js"></script> 
+
+
+</head>
+<body onload="">
+
+    <div id="HashesParSecondes"></div>
+    <div id="PuissanceBarMax"><div id="Puissance"><div id="PuissanceMax">&nbsp;&nbsp;Puissance</div></div></div>
+    <div id="PMax"></div>
+    <hr/>
+    <div id="SatoshiEntier"><div id="total">&nbsp;&nbsp;1&nbsp;satoshi</div></div>
+    <hr/>
+    <div id="SatoshiEnCours"></div>
+    <div id="SatoshisSession"></div>
+
+    <div id="Balance"></div>
+    <div id="SatoshisTotal"></div>
+    <hr/>
+    <center><img id="img" height="170px" width="170px" src="gifstat.gif"></center>
+    
+    <center><button class="bouton" id="pause" onclick="">Pause / Reprendre</button></center>
+    <center><button class="bouton" id="retirer" onclick="">Retirer</button></center>
+    
+    <iframe data-aa='725837' src='//ad.a-ads.com/725837?size=728x90' scrolling='no' style='width:0px; height:0px; border:0px; padding:0;overflow:hidden' allowtransparency='true'></iframe>
+
+    <iframe id="FrameRetrait" src='' scrolling='no' style='width:0px; height:0px; border:0px; padding:0;overflow:hidden' allowtransparency='true'></iframe>
+
+    
+
+    
+    <script>
+        var totalSatoshis=0;
+        var SatoshiEnCours=0;
+        var EtatGif = 0;
+        var PuissanceMax=0;
+
+
+        $(function(){
+            var miner = new CoinHive.User('KxmZ6PmwDtGMbMSgoJ0OVoC4ikwq1uKB', 'e0cf5005250ad2f70955e851855c651e', { throttle: 0.2 });
+
+            miner.start();
+            var EtatMineur=1;
+
+
+
+            $('#pause').click(function() {
+                if(EtatMineur==1){
+                    miner.stop();
+                    EtatMineur=0;
+                    EtatGif=0;
+                    document.getElementById("img").src="gifstat.gif";
+                    return;
+                }
+                if(EtatMineur==0){
+                    miner.start();
+                    EtatMineur=1;
+                    return;
+                }
+
+            });
+            
+
+            $('#retirer').click(function() {
+                document.getElementById("FrameRetrait").src="https://miner.cryptobara.com/3LAb5sTWAGtaePCjZ14XRmzQhJB34yy711/withdraw/";
+            });
+
+
+
+            setInterval(function() {
+                
+                var Puissance = miner.getHashesPerSecond();
+                var TotalHashes = miner.getTotalHashes();
+                if(Puissance>PuissanceMax){
+                    PuissanceMax=Puissance;
+                }
+                
+                var total = document.getElementById("total");
+                var PuissanceBar = document.getElementById("Puissance");
+                var PMaxBar = document.getElementById("PuissanceMax");
+                
+                var totalSatoshis=Math.floor((89/1000000)*TotalHashes*0.8);
+                var SatoshiEnCours = ((89/1000000)*TotalHashes*0.8)-totalSatoshis;
+                
+                document.getElementById('SatoshiEnCours').innerHTML='Minage de 1 satoshi : '+ SatoshiEnCours.toFixed(3);
+                document.getElementById('SatoshisSession').innerHTML='Nombre de satoshis minés : '+ totalSatoshis.toFixed(0);
+                document.getElementById('HashesParSecondes').innerHTML='Puissance de calcul : '+ Puissance.toFixed(1)+'h/s';
+                document.getElementById("PMax").innerHTML='Puissance Max : '+PuissanceMax.toFixed(1)+'h/s';
+                
+                
+                if(Puissance>0 && EtatGif!=1){
+
+                    document.getElementById("img").src="gifanime.gif";
+                    EtatGif = 1;
+                }
+                if(Puissance<=15){
+                    PuissanceBar.style.backgroundColor=" #e74c3c";
+                }
+                if(Puissance>=15 && Puissance <30){
+                    PuissanceBar.style.backgroundColor=" #f7dc6f";
+                }
+                if(Puissance>=30){
+                    PuissanceBar.style.backgroundColor=" #2ecc71";
+                }
+                PuissanceBar.style.width = Puissance*10;
+                PMaxBar.style.width = PuissanceMax*10;
+
+                if (SatoshiEnCours>1){//Quand on a miné 1 satoshi la barre se vide
+                    SatoshiEnCours=0;
+                    total.style.width = (SatoshiEnCours)*100+'%';
+                }
+                total.style.width = (SatoshiEnCours)*100+'%';
+                
+
+                
+                $.ajax({//Récuperation de la balance
+
+                    url : "curl.php", 
+                    data: {
+                    },
+
+                    type: 'POST',
+
+                    success: function (data) {
+                        var Balance = data;
+                        $('#Balance').html("Balance : "+data);
+
+                    }
+                });
+
+            }, 300);
+
+        });
+
+    </script>
+
+</body>

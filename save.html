@@ -1,0 +1,46 @@
+<html>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+<div id="save"></div>
+<div id="lu"></div>
+
+<script>
+var sat=43;
+$.ajax({
+
+                    url : "save.php", // ça c'est la page vers laquelle ta requete ajax seras envoyé
+                    data: {  // ici c'est que j'envoie sur la page
+
+                      balanceact : sat // donc j'envoie 'name' qui cprrespond à ce qui est dans mon input 'nom'
+                 
+                 },
+
+                    type: 'POST', // je l'envoie en POST
+
+
+                    success: function (data) {   // si ça à marché
+
+                        $('#save').html(data); // je lui dit de rafraichir ma div 'result' avec les 'data' de la page infos.php (voir page infos.php)
+                    }
+                        });
+setInterval(function() {
+$.ajax({
+
+                    url : "afficher.php", // ça c'est la page vers laquelle ta requete ajax seras envoyé
+                    data: {  // ici c'est que j'envoie sur la page
+
+                 
+                 },
+
+                    type: 'POST', // je l'envoie en POST
+
+
+                    success: function (data) {   // si ça à marché
+
+                        $('#lu').html(data); // je lui dit de rafraichir ma div 'result' avec les 'data' de la page infos.php (voir page infos.php)
+                    }
+                        });
+},200);
+                        
+</script>                        
+</html>

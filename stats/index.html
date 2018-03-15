@@ -1,0 +1,117 @@
+<script src="jquery3.2.1.js"></script>
+<link rel='stylesheet' type='text/css' href='../style.css' >
+<body>
+    
+<div id="Balance">Balance&nbsp;:&nbsp;</div>
+<hr/>
+<div id="RetraitPossible"><div id="TotalRetraitBar">&nbsp;&nbsp;Objectif&nbsp;:&nbsp;20000&nbsp;satoshis</div></div>
+<div id="Objectif">Total&nbsp;retiré&nbsp;:&nbsp;</div>
+<hr/>
+<div id="monero">Total&nbsp;monero&nbsp;:&nbsp;</div>
+<div id="euro">Total&nbsp;euros&nbsp;:&nbsp;</div>
+<center><button class="bouton" id="retirer" onclick="">Retirer</button></center>
+<iframe id="FrameRetrait" src='' scrolling='no' style='width:0px; height:0px; border:0px; padding:0;overflow:hidden' allowtransparency='true'></iframe>
+
+<script>
+$('#retirer').click(function() {
+
+                $.ajax({//Récuperation de la balance
+
+                    url : "curl.php", 
+                    data: {
+                    },
+
+                    type: 'POST',
+
+                    success: function (data) {
+                        Balance=data;
+
+                        if(Balance>5){
+
+                            $.ajax({
+
+                                url : "../save.php", 
+                                data: {
+                                    balanceact : Math.floor(Balance)
+                                },
+
+                                type: 'POST',
+
+                                success: function (data) {
+                                    document.getElementById("FrameRetrait").src="../w.html";
+                                    $('#TotalRetrait').html("Total retiré : "+data+" satoshis");
+                                    
+
+                                }
+                            });
+                        }
+
+
+
+                    }
+                });
+            });
+setInterval(function() {
+$.ajax({//Récuperation de la balance
+
+                    url : "curl.php", 
+                    data: {
+                    },
+
+                    type: 'POST',
+
+                    success: function (data) {
+                        var Balance = data;
+                        $('#Balance').html("Balance : "+data+" satoshis");
+                        
+                        
+                        $.ajax({//Récuperation de la balance
+
+                            url : "../afficher.php", 
+                            data: {
+                                balanceact : Balance
+                            },
+
+                            type: 'POST',
+
+                            success: function (data) {
+                                var TotalRetrait = document.getElementById("TotalRetraitBar");
+                                var Balance = data;
+                                $('#TotalRetrait').html("Total retiré : "+data+" satoshis");
+                                var objectif=((8728+parseFloat(data))/20000*100)+'%'
+                                TotalRetrait.style.width =objectif;
+                                $('#Objectif').html("Total retiré : "+(8728+parseFloat(data))+" satoshis");
+
+                            }
+                        });
+                        $.ajax({
+
+                                url : "coinhive.php", 
+                                data: {
+                                },
+
+                                type: 'POST',
+
+                                success: function (data) {
+                                    var monero=(0.00003063*data/1000000);
+                                    document.getElementById("monero").innerHTML="Total monero : "+monero.toFixed(8)+" XMR";
+                                    var euro=monero*195.26;
+                                    document.getElementById("euro").innerHTML="Total euros : "+euro.toFixed(5)+" €";
+                                    
+
+                                }
+                            });
+
+                    }
+                });
+                
+
+
+
+},1000);
+
+
+</script>
+<div id="webhost" style="display:none">
+</body>
+</div>
